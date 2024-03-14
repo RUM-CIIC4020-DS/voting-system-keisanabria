@@ -5,10 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import data_structures.ArrayList;
 import main.Candidate;
+import main.Ballot;
 
 public class Election {
 	private BufferedReader readerCandidates;
 	private BufferedReader readerBallots;
+	private ArrayList<Candidate> candidateList = new ArrayList<>();
 	
 	/* Constructor that implements the election logic using the files candidates.csv
 	and ballots.csv as input. (Default constructor) */
@@ -33,23 +35,18 @@ public class Election {
 	}
 	
 	// returns the name of the winner of the election
-	public String getWinner();
-	
-	// returns the total amount of ballots submitted
-	public int getTotalBallots() {
-		
+	public String getWinner() {
 		/*
-			1. Read through the candidates.csv and store each line in a list -> this will be
-			the candidates list that has to be used to create a ballot object 
-			2. Read the file -> store ballot string using ballot class 
-			WITHOUT INCLUDING EMPTY AND INVALID BALLOTS:
-			3. Store ballots in ballot ArrayList
-			4. Store ballot ArrayList into ballotList -> according to the first ballot, 
-			store the lists such as the ranks go down as the list moves to the right
+		1. Read through the candidates.csv and store each line in a list -> this will be
+		the candidates list that has to be used to create a ballot object 
+		2. Initialize an array list of size n ; n = amount of candidates
+		3. Read the file -> store ballot string using ballot class -> check that the type is not empty nor invalid -> 
+		in that ballot, getCandidateByRank(1) -> adds the ballot to the array list of size n
+		THIS IS DONE FOR THE PURPOSE OF WHEN ELIMINATING A CANDIDATE!
 		*/
 		
 		// Read through candidates.csv to convert each line into Candidate -> put each in a list
-		ArrayList<Candidate> candidateList = new ArrayList<>();
+		ArrayList<ArrayList<String>> ballotList = new ArrayList<>();
 		try {
 			String candidateLine;
 			while ((candidateLine = this.readerCandidates.readLine()) != null) {
@@ -61,31 +58,89 @@ public class Election {
 			e.printStackTrace();
 		}
 		
-		// --
+		// Every time you eliminate a candidate, add it to a global variable to count and return in getEliminatedCandidates()
 		
-		ArrayList<String> ballot = new ArrayList<String>();
-		ArrayList<ArrayList<String>> ballotList = new ArrayList<>();
+	}
+	
+	// returns the total amount of ballots submitted
+	public int getTotalBallots() {
+		
+		int ballotCount = 0;
 		
 		try {
-			String lines;
-			while ((lines = this.readerBallots.readLine()) != null) {
-				ballot.add(this.readerBallots.readLine()); // Returns a string -> better to save it into a variable or print it out!
-				ballotList.add(ballot);
+			String ballotLine;
+			while ((ballotLine = this.readerBallots.readLine()) != null) {
+				ballotCount++;
 			}
 			this.readerBallots.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return ballotCount;
 
 	}
 	
 	// returns the total amount of invalid ballots
-	public int getTotalInvalidBallots();
+	public int getTotalInvalidBallots() {
+		int invalidBallotsCount = 0;
+		
+		try {
+			String ballotLine;
+			while ((ballotLine = this.readerBallots.readLine()) != null) {
+				Ballot ballot = new Ballot(this.readerBallots.readLine(), candidateList);
+				if(ballot.getBallotType() == 2) {
+					invalidBallotsCount++;
+				}
+			}
+			this.readerBallots.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return invalidBallotsCount;
+	}
 	
 	// returns the total amount of blank ballots
-	public int getTotalBlankBallots();
+	public int getTotalBlankBallots() {
+		int blankBallotsCount = 0;
+		
+		try {
+			String ballotLine;
+			while ((ballotLine = this.readerBallots.readLine()) != null) {
+				Ballot ballot = new Ballot(this.readerBallots.readLine(), candidateList);
+				if(ballot.getBallotType() == 1) {
+					blankBallotsCount++;
+				}
+			}
+			this.readerBallots.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return blankBallotsCount;
+	}
+	
 	// returns the total amount of valid ballots
-	public int getTotalValidBallots();
+	public int getTotalValidBallots() {
+		int validBallotsCount = 0;
+		
+		try {
+			String ballotLine;
+			while ((ballotLine = this.readerBallots.readLine()) != null) {
+				Ballot ballot = new Ballot(this.readerBallots.readLine(), candidateList);
+				if(ballot.getBallotType() == 0) {
+					validBallotsCount++;
+				}
+			}
+			this.readerBallots.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return validBallotsCount;
+	}
+	
 	/* List of names for the eliminated candidates with the numbers of 1s they had,
 	must be in order of elimination. Format should be <candidate name>-<number of 1s
 	when eliminated>*/
@@ -96,20 +151,23 @@ public class Election {
 	* table with the vote distribution.
 	* Meant for helping in the debugging process.
 	*/
-	public void printBallotDistribution() {
-	 System.out.println("Total blank ballots:" + getTotalBlankBallots());
-	 System.out.println("Total invalid ballots:" + getTotalInvalidBallots());
-	 System.out.println("Total valid ballots:" + getTotalValidBallots());
-	 System.out.println(getEliminatedCandidates());
-	 for(Candidate c: this.getCandidates()) {
-	 System.out.print(c.getName().substring(0, c.getName().indexOf(" ")) + "\t");
-	 for(Ballot b: this.getBallots()) {
-	 int rank = b.getRankByCandidate(c.getId());
-	 String tableline = "| " + ((rank != -1) ? rank: " ") + " ";
-	 System.out.print(tableline);
-	 }
-	 System.out.println("|");
-	 }System.out.println("Total ballots:" + getTotalBallots());
-	 
-	}
+	/*
+		public void printBallotDistribution() {
+		 System.out.println("Total blank ballots:" + getTotalBlankBallots());
+		 System.out.println("Total invalid ballots:" + getTotalInvalidBallots());
+		 System.out.println("Total valid ballots:" + getTotalValidBallots());
+		 System.out.println(getEliminatedCandidates());
+		 for(Candidate c: this.getCandidates()) {
+		 System.out.print(c.getName().substring(0, c.getName().indexOf(" ")) + "\t");
+		 for(Ballot b: this.getBallots()) {
+		 int rank = b.getRankByCandidate(c.getId());
+		 String tableline = "| " + ((rank != -1) ? rank: " ") + " ";
+		 System.out.print(tableline);
+		 }
+		 System.out.println("|");
+		 }System.out.println("Total ballots:" + getTotalBallots());
+		 
+		}
+	*/
+	
 }
