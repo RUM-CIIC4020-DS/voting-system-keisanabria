@@ -46,7 +46,6 @@ public class Election {
 		*/
 		
 		// Read through candidates.csv to convert each line into Candidate -> put each in a list
-		ArrayList<ArrayList<String>> ballotList = new ArrayList<>();
 		try {
 			String candidateLine;
 			while ((candidateLine = this.readerCandidates.readLine()) != null) {
@@ -57,8 +56,36 @@ public class Election {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		ArrayList<ArrayList<Ballot>> candidatePerBallotList = new ArrayList<>(candidateList.size());
 		
-		// Every time you eliminate a candidate, add it to a global variable to count and return in getEliminatedCandidates()
+		try {
+			String ballotLine;
+			while ((ballotLine = this.readerBallots.readLine()) != null) {
+				Ballot ballot = new Ballot(this.readerBallots.readLine(), candidateList);
+				if(ballot.getBallotType() != 1 && ballot.getBallotType() != 2) {
+					int temp = ballot.getCandidateByRank(1); // CandidateID that is ranked 1 in that ballot
+					if(temp != -1) { // Condition for if the rank does not exist
+						candidatePerBallotList.get(temp-1).add(ballot);
+					}
+				}
+			}
+			this.readerBallots.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		// -------------------------------------------------------------------------------------------------------
+		
+		
+		/* 
+		 * 1. Count amount of 1s, 2s, 3s, ns per candidate
+		 * 2. Pending...
+		*/
+		
+		// Me quede implementing step 1!
+		
+		// (TODO: At the end) Every time you eliminate a candidate, add it to a global variable to count and return in getEliminatedCandidates()
 		
 	}
 	
