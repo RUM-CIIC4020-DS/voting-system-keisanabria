@@ -91,6 +91,9 @@ public class Ballot {
 	
 	// Eliminates the candidate with the given id
 	public boolean eliminate(int candidateId) {
+		
+		/* Me quede reemplementing this method whilst using the ArrayList method as reference */
+		
 		// Check if getBallotType() != 1
 		// Check that the candidateId exists
 		// Use remove(candidateId) to eliminate the candidate

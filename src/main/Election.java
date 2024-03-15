@@ -153,7 +153,6 @@ public class Election {
 	public void updateVoteCountList() {
 		// Get eliminated candidate's ID#
 		// With this, lower numbered rankNum increase
-		/* Me quede implementing this method */
 		
 	}
 	
