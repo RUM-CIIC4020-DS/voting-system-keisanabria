@@ -11,6 +11,7 @@ public class Election {
 	private BufferedReader readerCandidates;
 	private BufferedReader readerBallots;
 	private ArrayList<Candidate> candidateList = new ArrayList<>();
+	private ArrayList<Integer> lowestVotedCandidates = new ArrayList<Integer>();
 	
 	/* Constructor that implements the election logic using the files candidates.csv
 	and ballots.csv as input. (Default constructor) */
@@ -36,58 +37,144 @@ public class Election {
 	
 	// returns the name of the winner of the election
 	public String getWinner() {
-		/*
-		1. Read through the candidates.csv and store each line in a list -> this will be
-		the candidates list that has to be used to create a ballot object 
-		2. Initialize an array list of size n ; n = amount of candidates
-		3. Read the file -> store ballot string using ballot class -> check that the type is not empty nor invalid -> 
-		in that ballot, getCandidateByRank(1) -> adds the ballot to the array list of size n
-		THIS IS DONE FOR THE PURPOSE OF WHEN ELIMINATING A CANDIDATE!
-		*/
 		
 		// Read through candidates.csv to convert each line into Candidate -> put each in a list
 		try {
-			String candidateLine;
-			while ((candidateLine = this.readerCandidates.readLine()) != null) {
-				Candidate candidate = new Candidate(this.readerCandidates.readLine());
-				candidateList.add(candidate);
-			}
-			this.readerCandidates.close();
+		    String candidateLine;
+		    while ((candidateLine = this.readerCandidates.readLine()) != null) {
+		        Candidate candidate = new Candidate(candidateLine);
+		        candidateList.add(candidate);
+		    }
+		    this.readerCandidates.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+		    e.printStackTrace();
 		}
 
-		ArrayList<ArrayList<Ballot>> candidatePerBallotList = new ArrayList<>(candidateList.size());
-		
-		try {
-			String ballotLine;
-			while ((ballotLine = this.readerBallots.readLine()) != null) {
-				Ballot ballot = new Ballot(this.readerBallots.readLine(), candidateList);
-				if(ballot.getBallotType() != 1 && ballot.getBallotType() != 2) {
-					int temp = ballot.getCandidateByRank(1); // CandidateID that is ranked 1 in that ballot
-					if(temp != -1) { // Condition for if the rank does not exist
-						candidatePerBallotList.get(temp-1).add(ballot);
-					}
-				}
-			}
-			this.readerBallots.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		// Initialize a 2D ArrayList to store the count of votes for each candidate and rank
+		ArrayList<ArrayList<Integer>> voteCountList = new ArrayList<>(candidateList.size());
+		for (int i = 0; i < candidateList.size(); i++) {
+		    ArrayList<Integer> candidateVotes = new ArrayList<>(candidateList.size());
+		    // Initialize each candidate's vote count for each rank to 0
+		    for (int j = 0; j < candidateList.size(); j++) {
+		        candidateVotes.add(0);
+		    }
+		    voteCountList.add(candidateVotes);
 		}
+
+		try {
+		    String ballotLine;
+		    while ((ballotLine = this.readerBallots.readLine()) != null) {
+		        Ballot ballot = new Ballot(ballotLine, candidateList);
+		        if (ballot.getBallotType() != 1 && ballot.getBallotType() != 2) {
+		            // Loop through each rank in the ballot to count the votes for each candidate
+		            for (int i = 1; i <= candidateList.size(); i++) {
+		                int candidateID = ballot.getCandidateByRank(i);
+		                if (candidateID != -1) {
+		                    int candidateIndex = candidateID - 1; // Adjust index to match the list index
+		                    int currentCount = voteCountList.get(candidateIndex).get(i - 1);
+		                    voteCountList.get(candidateIndex).set(i - 1, currentCount + 1); // Increment vote count for the corresponding rank
+		                }
+		            }
+		        }
+		    }
+		    this.readerBallots.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+
 		
 		// -------------------------------------------------------------------------------------------------------
 		
+		double fiftypercent = 0.5*getTotalValidBallots();
+		int rankCount = 0;
+		int rankNum = 0;
+		int lowestVotes = voteCountList.get(0).get(0);
+		int LVCandidateID;
+		boolean check = false;
+		boolean multiplesMethodTrigger = false;
 		
-		/* 
-		 * 1. Count amount of 1s, 2s, 3s, ns per candidate
-		 * 2. Pending...
-		*/
+		while(rankCount < candidateList.size()) {
+			while(rankNum < candidateList.size()) {
+				
+				if(!multiplesMethodTrigger) {
+					// Return winner if they have > 50% votes
+					if(voteCountList.get(rankNum).get(rankCount) > fiftypercent) {
+						return candidateList.get(rankNum).getName();
+					}
+					
+					// If there's no winner, iterate for the lowest number of votes
+					if(voteCountList.get(rankNum).get(rankCount) < lowestVotes) {
+						lowestVotes = voteCountList.get(rankNum).get(rankCount);
+					}
+				} else {
+					for(int candidateIndex : lowestVotedCandidates) {
+						if(voteCountList.get(rankNum).get(candidateIndex) < lowestVotes) {
+							lowestVotes = voteCountList.get(rankNum).get(candidateIndex);
+						}
+					}
+				}
+				
+				LVCandidateID = candidateList.get(rankNum).getId(); // Lowest Votes' Candidate ID
+				rankNum++;
+			}
+			
+			if(rankVotesHasNoDuplicates(rankCount, voteCountList)) {
+				// active status -> false
+				check = true;
+				break;
+			}
+			
+			multiplesMethodTrigger = true;
+			rankNum = lowestVotedCandidates.get(0);
+			rankCount++;
+			if(!multiplesMethodTrigger) {
+				lowestVotes = voteCountList.get(0).get(rankCount);
+			} else {
+				lowestVotes = voteCountList.get(0).get(lowestVotedCandidates.get(0));
+			}
+		}
 		
-		// Me quede implementing step 1!
+		if(check) {
+			//eliminate LVCandidateID
+			// turn check back to false!
+			// Create an update method to implement here
+		}
+		
+		// If no one was eliminated, eliminate the candidate with the longest ID#
+		if(rankCount == candidateList.size()-1) {
+			// eliminate longest ID#
+			// Implement update method here
+		}
 		
 		// (TODO: At the end) Every time you eliminate a candidate, add it to a global variable to count and return in getEliminatedCandidates()
 		
 	}
+	
+	public void updateVoteCountList() {
+		// Get eliminated candidate's ID#
+		// With this, lower numbered rankNum increase
+		/* Me quede implementing this method */
+		
+	}
+	
+	public boolean rankVotesHasNoDuplicates(int n, ArrayList<ArrayList<Integer>> nm) {
+		ArrayList<Integer> rankList = new ArrayList<Integer>();
+		
+		for(ArrayList<Integer> m : nm) {
+			rankList.add(m.get(n));
+		}
+		
+        ArrayList<Integer> seenVotes = new ArrayList<>();
+        
+        for(int votes = 0; votes < rankList.size(); votes++) {
+        	if(seenVotes.contains(rankList.get(votes))) {
+        		lowestVotedCandidates.add(votes); // Storing ID#s / candidates' indexes
+        		return false; // Found a duplicate
+        	}
+        	seenVotes.add(rankList.get(votes));
+        }
+        return true; // No duplicates found
+    }
 	
 	// returns the total amount of ballots submitted
 	public int getTotalBallots() {
