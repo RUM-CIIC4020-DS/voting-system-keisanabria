@@ -4,9 +4,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import data_structures.ArrayList;
+import interfaces.List;
 import main.Candidate;
 import main.Ballot;
 
+@SuppressWarnings("unused")
 public class Election {
 	private BufferedReader readerCandidates;
 	private BufferedReader readerBallots;
@@ -16,8 +18,14 @@ public class Election {
 	/* Constructor that implements the election logic using the files candidates.csv
 	and ballots.csv as input. (Default constructor) */
 	public Election() {
-		BufferedReader readerCandidates = new BufferedReader(new FileReader("inputFiles/candidates.csv"));
-		BufferedReader readerBallots = new BufferedReader(new FileReader("inputFiles/ballots.csv"));
+		BufferedReader readerCandidates = null;
+		BufferedReader readerBallots = null;
+		try {
+			readerCandidates = new BufferedReader(new FileReader("inputFiles/candidates.csv"));
+			readerBallots = new BufferedReader(new FileReader("inputFiles/ballots.csv"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		this.readerCandidates = readerCandidates;
 		this.readerBallots = readerBallots;
@@ -27,8 +35,14 @@ public class Election {
 	the election logic. Note: The files should be found in the input folder. */
 	public Election(String candidates_filename, String ballots_filename) {
 		
-		BufferedReader readerCandidates = new BufferedReader(new FileReader("inputFiles/" + candidates_filename));
-		BufferedReader readerBallots = new BufferedReader(new FileReader("inputFiles/" + ballots_filename));
+		BufferedReader readerCandidates = null;
+		BufferedReader readerBallots = null;
+		try {
+			readerCandidates = new BufferedReader(new FileReader("inputFiles/" + candidates_filename));
+			readerBallots = new BufferedReader(new FileReader("inputFiles/" + ballots_filename));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		this.readerCandidates = readerCandidates;
 		this.readerBallots = readerBallots;
@@ -257,7 +271,10 @@ public class Election {
 	/* List of names for the eliminated candidates with the numbers of 1s they had,
 	must be in order of elimination. Format should be <candidate name>-<number of 1s
 	when eliminated>*/
-	public List<String> getEliminatedCandidates();
+	public List<String> getEliminatedCandidates(){
+		List<String> stringList = new ArrayList<>();
+		return stringList;
+	}
 	
 	/**
 	* Prints all the general information about the election as well as a

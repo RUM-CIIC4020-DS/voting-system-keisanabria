@@ -14,9 +14,11 @@ public class Ballot {
 	private ArrayList<Integer> candidateIDList = new ArrayList<>();
 	private List<Candidate> candidates;
 	private String line;
+	private Integer[] elements;
 	
 	public Ballot(String line, List<Candidate> candidates) {
 		this.candidates = candidates;
+		this.elements = (Integer[]) new Object[candidateIDList.size()];
 		this.line = line;
 		String[] sections = null;
 		
@@ -92,7 +94,19 @@ public class Ballot {
 	// Eliminates the candidate with the given id
 	public boolean eliminate(int candidateId) {
 		
-		/* Me quede reemplementing this method whilst using the ArrayList method as reference */
+//		int size = candidateIDList.size();
+//		
+//		// Check bounds
+//		if(candidateId < 0 || candidateId >= candidateIDList.size())
+//			throw new IndexOutOfBoundsException();
+//		// Shift values to the left
+//		for(int i = candidateId; i < this.candidateIDList.size()-1; i++)
+//			this.elements[i] = this.elements[i+1];
+//		// Null the last position
+//		this.elements[this.candidateIDList.size()-1]= null;
+//		// Decrease size
+//		size--;
+//		return true;
 		
 		// Check if getBallotType() != 1
 		// Check that the candidateId exists
