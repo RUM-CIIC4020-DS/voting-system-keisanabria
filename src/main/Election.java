@@ -26,6 +26,7 @@ public class Election {
 	private ArrayList<Candidate> candidateList = new ArrayList<>();
 	private ArrayList<Integer> lowestVotedCandidates = new ArrayList<Integer>();
 	private int eliminatedCandidatesCount = 0;
+	List<String> eliminatedCandidates = new ArrayList<>();
 	
 	/**
 	 * Constructor that implements the election logic using 
@@ -219,18 +220,11 @@ public class Election {
 		    eliminatedCandidatesCount++;
 		}
 		
-		// (TODO: At the end) Every time you eliminate a candidate, add it to a global variable to count and return in getEliminatedCandidates()
+	    for (int i = 0; i < eliminatedCandidates.size(); i++) {
+	        eliminatedCandidates.add(candidateList.get(i).getName() + "-" + voteCountList.get(i).get(0));
+	    }
 		
 		return ""; // Dummy return
-	}
-	
-	/**
-	 *  The algorithm uses updates the 2D Array that counts the votes.
-	*/
-	public void updateVoteCountList() {
-		// Get eliminated candidate's ID#
-		// With this, lower numbered rankNum increase
-		
 	}
 	
 	/**
@@ -392,6 +386,8 @@ public class Election {
 			e.printStackTrace();
 		}
 		
+//		System.out.println(validBallotsCount);
+		
 		return validBallotsCount;
 	}
 	
@@ -404,8 +400,7 @@ public class Election {
 	 *  @return list of eliminated candidates
 	*/
 	public List<String> getEliminatedCandidates(){
-		List<String> stringList = new ArrayList<>();
-		return stringList;
+		return this.eliminatedCandidates;
 	}
 	
 	/**
