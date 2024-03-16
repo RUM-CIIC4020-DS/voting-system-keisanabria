@@ -3,9 +3,15 @@ package main;
 import interfaces.List;
 import data_structures.ArrayList;
 
-/* Creates a ballot based on the line it receives. The format for line is
-id#,candidate_name . It also receives a List of all the candidates in the
-elections.*/
+/**
+ * A class that is used to process and analyze ballots in an election.
+ * <p>
+ * It processes and analyzes 
+ * ballots in an election, utilizing ArrayLists to store ranks 
+ * and candidate IDs and a List for storing Candidate objects, 
+ * allowing for efficient data manipulation and integration 
+ * within the election system.
+ */
 public class Ballot {
 	private int ballotNum;
 	private int rank;
@@ -14,11 +20,27 @@ public class Ballot {
 	private ArrayList<Integer> candidateIDList = new ArrayList<>();
 	private List<Candidate> candidates;
 	private String line;
-	private Integer[] elements;
 	
+	/**
+	 * Creates a ballot based on the line it receives. 
+	 * The format for line is id#,candidate_name . It 
+	 * also receives a List of all the candidates in the
+	elections.
+	 * <p>
+	 *  The algorithm utilizes ArrayLists to manage `rankList`
+	 *   and `candidateIDList`, storing ranks and candidate 
+	 *   IDs respectively for each candidate in the ballot. They are used
+	 *    because they provide dynamic resizing, efficient 
+	 *    insertion and retrieval operations, essential for 
+	 *    storing ranks and candidate IDs, allowing flexibility 
+	 *    in managing data structures during runtime.
+	 *  <p>
+	 *  @param line containing ballots' information
+	 *  @param candidates a list of the candidate's information
+	*/
 	public Ballot(String line, List<Candidate> candidates) {
 		this.candidates = candidates;
-		this.elements = (Integer[]) new Object[candidateIDList.size()];
+		int size = candidateIDList.size();
 		this.line = line;
 		String[] sections = null;
 		
@@ -47,12 +69,29 @@ public class Ballot {
 		
 	}
 	
-	// Returns the ballot number
+	/**
+     * Gets the ballot number
+     * <p>
+     * It returns the ballot number found in the constructor.
+     * <p>
+	 *  @return the ballot number
+     */
 	public int getBallotNum() {
 		return this.ballotNum;
 	}
 	
-	//Returns the rank for that candidate, if no rank is available return -1
+	/**
+	 * Gets the rank of the input candidate 
+	 * <p>
+	 * The algorithm uses ArrayLists for both candidateIDList 
+	 * and rankList. ArrayLists are used because they provide 
+	 * dynamic sizing, efficient random access, and allow for 
+	 * easy manipulation of elements, which are essential for 
+	 * storing candidate IDs and their corresponding ranks.
+	 * <p>
+	 * @param candidateID - ID number of the candidate
+	 * @return the rank for that candidate, if no rank is available return -1
+	 */
 	public int getRankByCandidate(int candidateID) {
 		//check that the ballot isn't empty
 		// check if Candidateidlist has that id, if it does, return index
@@ -73,7 +112,18 @@ public class Ballot {
 		return -1;
 	}
 	
-	//Returns the candidate with that rank, if no candidate is available return -1.
+	/**
+	 * Gets the candidate of the input rank 
+	 * <p>
+	 * The algorithm uses ArrayLists for both candidateIDList 
+	 * and rankList. ArrayLists are used because they provide 
+	 * dynamic sizing, efficient random access, and allow for 
+	 * easy manipulation of elements, which are essential for 
+	 * storing candidate IDs and their corresponding ranks.
+	 * <p>
+	 * @param rank of the candidate to be determined
+	 * @return the candidate with that rank, if no candidate is available return -1
+	 */
 	public int getCandidateByRank(int rank) {
 		//if that rank doesn't exist, then return -1
 		
@@ -91,22 +141,36 @@ public class Ballot {
 		return -1;
 	}
 	
-	// Eliminates the candidate with the given id
+	/**
+	 * Eliminates the candidate with the given id
+	 * <p>
+	 * The algorithm primarily uses ArrayLists 
+	 * (`candidateIDList` and `rankList`). 
+	 * ArrayLists are used because they allow dynamic 
+	 * resizing, which is necessary for adding and 
+	 * removing elements efficiently in the context 
+	 * of candidate elimination operations.
+	 * <p>
+	 * @param candidateId to be eliminated
+	 * @return if the candidateId was successfully eliminated (true or false)
+	 */
 	public boolean eliminate(int candidateId) {
 		
-//		int size = candidateIDList.size();
-//		
-//		// Check bounds
-//		if(candidateId < 0 || candidateId >= candidateIDList.size())
-//			throw new IndexOutOfBoundsException();
-//		// Shift values to the left
-//		for(int i = candidateId; i < this.candidateIDList.size()-1; i++)
-//			this.elements[i] = this.elements[i+1];
-//		// Null the last position
-//		this.elements[this.candidateIDList.size()-1]= null;
-//		// Decrease size
-//		size--;
-//		return true;
+		/*
+			int size = candidateIDList.size();
+			
+			// Check bounds
+			if(candidateId < 0 || candidateId >= candidateIDList.size())
+				throw new IndexOutOfBoundsException();
+			// Shift values to the left
+			for(int i = candidateId; i < this.candidateIDList.size()-1; i++)
+				this.elements[i] = this.elements[i+1];
+			// Null the last position
+			this.elements[this.candidateIDList.size()-1]= null;
+			// Decrease size
+			size--;
+			return true;
+		*/
 		
 		// Check if getBallotType() != 1
 		// Check that the candidateId exists
@@ -133,6 +197,22 @@ public class Ballot {
 
 	}
 	
+	/**
+	 * Checks if the list containing all the ranks is valid
+	 * <p>
+	 * The algorithm uses an ArrayList named `seenRanks` to
+	 *  keep track of seen ranks and ensure there are no repeated 
+	 *  numbers. It also iterates over a list called `rankList` to 
+	 *  check if the ranks are in ascending order and not skipped, 
+	 *  returning false if any condition fails. Using an ArrayList 
+	 *  for `seenRanks` is efficient because it provides constant-time 
+	 *  (O(1)) lookup for checking if a rank has already been seen, 
+	 *  ensuring quick verification of repeated numbers during
+	 *   iteration.
+	 * <p>
+	 * @param candidateId to be eliminated
+	 * @return if the candidateId was successfully eliminated (true or false)
+	 */
 	public boolean isValidRankList() {
         int prevRank = -1;
         ArrayList<Integer> seenRanks = new ArrayList<>();
@@ -158,7 +238,19 @@ public class Ballot {
         return true; // All conditions satisfied
     }
 	
-	// Check if no numbers are being repeated in the candidateIDList
+	/**
+	 * Check if no numbers are being repeated in the candidateIDList
+	 * <p>
+	 * The algorithm uses an ArrayList to track seen candidate IDs 
+	 * and efficiently checks for duplicates using the contains 
+	 * method, ensuring that each candidate ID is unique within 
+	 * the list. This approach is efficient because ArrayList 
+	 * provides constant time lookup with contains, and tracking 
+	 * seen candidates helps avoid iterating over the entire list 
+	 * repeatedly.
+	 * <p>
+	 * @return if the candidateIDList contains no duplicates (true or false)
+	 */
     public boolean candidateIDListHasNoDuplicates() {
         ArrayList<Integer> seenCandidates = new ArrayList<>();
 
@@ -172,9 +264,18 @@ public class Ballot {
     }
     
     
-	
-	/* Returns an integer that indicates if the ballot is: 0 – valid, 1 – blank or 2 -
-	invalid */
+    /**
+	 * Gets the ballot type
+	 * <p>
+	 * The algorithm uses ArrayLists for `rankList` and 
+	 * `candidateIDList`. ArrayLists are used because they 
+	 * provide dynamic resizing and efficient random access, 
+	 * which is suitable for storing and accessing ballot 
+	 * data efficiently.
+	 * <p>
+	 * @return an integer that indicates if the 
+	 * ballot is: 0 – valid, 1 – blank or 2 - invalid
+	 */
 	public int getBallotType() {
 		if(isValidRankList() == false || !candidateIDListHasNoDuplicates()){
 			return 2;
